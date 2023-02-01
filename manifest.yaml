@@ -1,0 +1,81 @@
+vendor: "apulis.infer"
+name: "apulis-缺陷分类"
+model_version: "220624rc0"
+app:  classification
+logo: ""
+platform:
+- APulis-IQI
+source: preset
+framework: "Pytorch"
+backbone: "mmdet"
+field: "cv"
+task: "classification"
+engine: "harbor.apulis.cn:8443/algorithm/apulistech/mmopenlab:0.3"
+description: "基于mmcls的缺陷分类模型"
+
+devices:
+- cpu: 2
+  device_num: 1
+  memory: 4
+  series: 
+  type: nvidia_gpu
+distributed_framework: ""
+
+train:
+  entry: "mmclassification/tools/train.sh"
+  visualization: "tensorboard"
+  sys_params:
+    - arg: "data_path"
+      name: "data_path"
+      desc: "数据集路径"
+    - arg: "resume-from"
+      name: "pretrained_model"
+      desc: "预训练模型路径"
+    - arg: "work_dir"
+      name: "output_path"
+      desc: "输出路径"
+  user_params:
+    - name: "config"
+      type: string
+      default: "mmclassification/configs/resnet/resnet50_b32x8_userdefine.py"
+      required: true
+      desc: "模型config相对路径"
+      editable: false
+    - name: "epoch"
+      type: "int"
+      default: 5
+      required: true
+      desc: "epoch size"
+      editable: true
+    - name: "batchsize"
+      type: "int"
+      default: 32
+      required: true
+      desc: "batch size"
+      editable: true
+
+eval:
+  entry: "mmclassification/tools/test.sh"
+  sys_params:
+    - arg: "testset"
+      name: "data_path"
+      desc: "数据集路径"
+    - arg: "checkpoint"
+      name: "checkpoint_path"
+      desc: "评估模型路径"
+    - arg: "out"
+      name: "output_path"
+      desc: "评估结果路径"
+  user_params:
+    - name: "config"
+      type: string
+      default: "mmclassification/configs/resnet/resnet50_b32x8_userdefine.py"
+      required: true
+      desc: "模型config相对路径"
+      editable: false
+    - name: "metrics"
+      type: string
+      default: "accuracy"
+      required: true
+      desc: "评估指标"
+      editable: true

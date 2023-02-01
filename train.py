@@ -9,7 +9,7 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.optim as optim
 import yaml
-from albumentations.augmentations import transforms
+import albumentations as transforms
 from albumentations.core.composition import Compose, OneOf
 from sklearn.model_selection import train_test_split
 from torch.optim import lr_scheduler
@@ -194,14 +194,14 @@ def main():
             config['name'] = '%s_%s_wDS' % (config['dataset'], config['arch'])
         else:
             config['name'] = '%s_%s_woDS' % (config['dataset'], config['arch'])
-    os.makedirs('models/%s' % config['name'], exist_ok=True)
+    os.makedirs('/home/cjj/outputs/models/%s' % config['name'], exist_ok=True)
 
     print('-' * 20)
     for key in config:
         print('%s: %s' % (key, config[key]))
     print('-' * 20)
 
-    with open('models/%s/config.yml' % config['name'], 'w') as f:
+    with open('/home/cjj/outputs/models/%s/config.yml' % config['name'], 'w') as f:
         yaml.dump(config, f)
 
     # define loss function (criterion)
@@ -330,13 +330,13 @@ def main():
         log['val_loss'].append(val_log['loss'])
         log['val_iou'].append(val_log['iou'])
 
-        pd.DataFrame(log).to_csv('models/%s/log.csv' %
+        pd.DataFrame(log).to_csv('/home/cjj/outputs/models/%s/log.csv' %
                                  config['name'], index=False)
 
         trigger += 1
 
         if val_log['iou'] > best_iou:
-            torch.save(model.state_dict(), 'models/%s/model.pth' %
+            torch.save(model.state_dict(), '/home/cjj/outputs/models/%s/model.pth' %
                        config['name'])
             best_iou = val_log['iou']
             print("=> saved best model")

@@ -1,0 +1,53 @@
+#必填: 模型开发商,目前为平台枚举值
+vendor: apulis.infer
+#选填: 应用名称,即标签名称
+app:    det
+#选填: 名称
+name:   目标检测
+#选填: 
+description: "单模型目标检测"
+
+
+# 由  device(type+series) + kernel + model_path 唯一决定一个推理服务启动所需要的的全部信息
+
+#可用的推理框架列表
+serves:
+      #选填，可选值参考selector.yaml中 infer_framework 字段
+    - framework: ACL
+      #必填,以infer文件夹为根目录,此列表中应该唯一
+      model_path: bert.om
+      #必填，如果为air那么平台会自动进行转换为om，可选值参考selector.yaml中 model_format 字段
+      format: om
+      #选填，对应serve.yaml中的值, 模型推理精度 ，可选值参考selector.yaml中 precision 字段
+      precision: int8
+      #选填, 相对于infer根目录,存放该推理服务相关所有信息
+      plugin: apuisv@huawei_npu.310
+      #选填:  推理相关描述,同 serve.yaml中的 inference描述
+      inference:
+          #[可选]对接推理核心  支持 apuisv,mindx
+          kernel: apuisv
+          #[可选]对接用户协议  空表示默认使用 apulis_infer.proto协议
+          agent:  ""
+          #允许透传
+          passthrough: true
+          #[可选] 如果需要额外协议 默认加载transformer目录下 *.proto协议文件
+          proto:  "ext.proto"
+          #[可选] 需要的推理镜像地址 
+          engine: "harbor.apulis.cn:8443/algorithm/apulistech/apulis-inference-serving:1.0.0-rc0_cuda-11.5_mindx-2.0.3_triton-22.03"
+          #[可选] 应用镜像启动入口,为空则由平台额外启动器插入工具启动(必须是平台内置支持的kernel)
+          entrypoint: "/apulis_infer/script/start.sh"
+          #正常最大请求延时,单位毫秒 ms
+          healthy_delay: 500
+          #[必选] 硬件资源描述
+          devices:
+            #必填，可选值参考selector.yaml中 device_type 字段
+            - type: nvidia_gpu
+              #选填，设备型号，gpu与cpu不需要填写该字段 ，填写该字段则进行型号筛选。多个型号使用逗号分割 目前参考值 | a310 | a910 | 910b | 910pro | 910prob
+              series: 
+              #选填，最少使用的设备卡数
+              device_num: 1
+              #选填，最少使用的CPU核心数，单位 个
+              cpu: 2
+              #选填，最少使用的内存大小，单位 GB
+              memory: 8
+
